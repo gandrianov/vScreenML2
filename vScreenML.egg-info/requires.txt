@@ -1,0 +1,4 @@
+rdkit
+oddt
+xgboost
+pandas

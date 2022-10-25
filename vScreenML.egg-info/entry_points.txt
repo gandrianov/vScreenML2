@@ -1,0 +1,6 @@
+[console_scripts]
+vscreenml_calculate_features = vScreenML.main:calculate_features
+vscreenml_minimize_complex = vScreenML.main:minimize_pdb_complex
+vscreenml_mol2params = vScreenML.utils.mol2genparams_utils:run_mol2params
+vscreenml_predict_score = vScreenML.utils.xgboost_utils:predict_vscreenml_score
+vscreenml_train_model = vScreenML.utils.xgboost_utils:train_model

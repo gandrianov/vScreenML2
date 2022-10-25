@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: vScreenML
+Version: 2.0.0
+Summary: ML classifier for rescoring of virtual screening hits to prune out false positives
+Home-page: https://github.com/gandrianov/vScreenML
+Author: Grigorii Andrianov, Yusuf Adeshina and John Karanicolas
+Author-email: grigorii.andrianov@gmail.com
+License: MIT
+Keywords: cheminformatics,virtual screening
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+License-File: LICENSE
