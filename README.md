@@ -1,4 +1,4 @@
-VScreenML_v2
+vScreenML (v2)
 ==============================
 
 Python-based package of [original implementation](https://github.com/karanicolaslab/vscreenml) of [VScreenML](https://www.pnas.org/content/117/31/18477). 
