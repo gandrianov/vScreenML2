@@ -35,7 +35,6 @@ def minimize_pdb_complex():
     pyrosetta_utils.init_pyrosetta(f"-beta -extra_res_fa {params_filenames}")
 
     # compile pdb into one pdb strings
-    print(args.ligands)
     ligand_pdb_strings = [open(p, "r").read() for p in ligand_pdbs]
     protein_pdb_string = open(protein, "r").read() 
     pdbstring = protein_pdb_string + "\n" + "\n".join(ligand_pdb_strings)
