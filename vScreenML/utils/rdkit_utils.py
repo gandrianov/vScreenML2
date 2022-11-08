@@ -171,12 +171,13 @@ def load_pdbstring(pdbstring, params=[]):
     params = dict(params)
 
     mol = assign_bonds(mol, mol_structure, params)
-    
-    mol.UpdatePropertyCache()
-    Chem.SanitizeMol(mol)
+    # mol.UpdatePropertyCache()
+
+    problems = Chem.DetectChemistryProblems(mol)
+
+    Chem.SanitizeMol(mol, sanitizeOps=Chem.SanitizeFlags.SANITIZE_ALL ^ Chem.SanitizeFlags.SANITIZE_KEKULIZE)
    
     return mol
-
 
 
 def prepare_amino_acids_connectivity():
@@ -194,3 +195,53 @@ def prepare_amino_acids_connectivity():
             print(f, name)
 
     print(set([aa[2] for a in aas.values() for aa in a]))
+
+
+def read_mol2(mol2fname):
+
+    bonds_dict = {"ar":Chem.BondType.AROMATIC,
+                  "am":Chem.BondType.SINGLE,
+                  "1" :Chem.BondType.SINGLE,
+                  "2" :Chem.BondType.DOUBLE,
+                  "3" :Chem.BondType.TRIPLE}
+
+    mol = Chem.RWMol()
+    
+    mol2 = open(mol2fname, "r").read()
+
+    atoms_mol2 = mol2.split("@<TRIPOS>ATOM\n")[-1].split("\n@<TRIPOS>BOND")[0]
+    atoms_mol2 = [[rr for rr in r.split(" ") if rr != ""] for r in atoms_mol2.split("\n") if len(r) != 0]
+    atoms_mol2 = {r[0]:r[5].split(".")[0] for r in atoms_mol2}
+
+    atoms_rdkit = {idx:mol.AddAtom(Chem.Atom(symbol)) for idx, symbol in atoms_mol2.items()}
+    atoms_rdkit_reverse = {v:k for k,v in atoms_rdkit.items()}
+
+
+    bonds = mol2.split("@<TRIPOS>BOND\n")[-1]
+    bonds = [[rr for rr in r.split(" ") if rr != ""] for r in bonds.split("\n") if len(r) != 0]
+    bonds = [r[1:] for r in bonds]
+
+    for begin_idx, end_idx, b_order in bonds:
+        begin_idx = atoms_rdkit[begin_idx]
+        end_idx   = atoms_rdkit[end_idx]
+        
+        mol.AddBond(begin_idx, end_idx, order=bonds_dict[b_order])
+
+    explicit_valence = {"O":2, "N":3, "C":4, "H":1}
+
+    for i, a in enumerate(mol.GetAtoms()):
+        a_symbol = a.GetSymbol()
+        a.UpdatePropertyCache(strict=False)
+        a.SetNoImplicit(True)
+
+        if a_symbol in explicit_valence:
+            formal_charge = a.GetExplicitValence() - explicit_valence[a_symbol]
+            a.SetFormalCharge(formal_charge)
+
+    if mol.GetNumAtoms() != Chem.AddHs(mol).GetNumAtoms():
+        return None
+
+    if Chem.SanitizeMol(mol, sanitizeOps=Chem.SanitizeFlags.SANITIZE_ALL ^ Chem.SanitizeFlags.SANITIZE_KEKULIZE, catchErrors=True) != 0:
+        return None
+
+    return Chem.MolToSmiles(mol)

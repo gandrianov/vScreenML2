@@ -453,8 +453,13 @@ class MoleculeClass:
         else:
             raise RuntimeError("No space group %s"%spacegrp)
             
-    def report_pdbfile(self,outfile):
-        out = open(outfile,'w')
+    def report_pdbfile(self,outfile, as_string=False):
+
+        if not as_string:
+            out = open(outfile,'w')
+        else:
+            out = outfile
+
         if self.crystinfo != '':
             out.write(self.crystinfo+'\n')
 
@@ -462,7 +467,9 @@ class MoleculeClass:
         for i,atm in enumerate(self.atms):
             out.write(form%(i+1,atm.name,self.option.get_resname(),1,
                             self.xyz[i][0],self.xyz[i][1],self.xyz[i][2]))
-        out.close()
+
+        if not as_string:
+            out.close()
 
     def report_elec_cp_rep(self,outfile):
         out = open(outfile,'w')
@@ -492,8 +499,12 @@ class MoleculeClass:
         for grp in self.funcgrps:
             grp.show(out)
 
-    def report_paramsfile(self,outfile):
-        out = open(outfile,'w')
+    def report_paramsfile(self,outfile, as_string=False):
+
+        if not as_string:
+            out = open(outfile,'w')
+        else:
+            out = outfile
 
         # start writing
         resname = self.option.get_resname()
@@ -652,7 +663,8 @@ class MoleculeClass:
             # unused long-ring: commented out from params
             ichi += 1
 
-        out.close()
+        if not as_string:
+            out.close()
 
     #should I merge define_chis1 & assign_rotable_torsions?
     def define_chargegrps(self):
