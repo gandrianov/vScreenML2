@@ -106,26 +106,80 @@ def assign_bonds(mol, mol_structure, params):
 
             elif residue_name in params:
 
-                for atom_name, atom_idx in residues[residue_idx].items():
+                bond_props = params[residue_name][0]
+                atom_props = params[residue_name][1]
 
-                    if atom_name in params[residue_name]:
-                        for atom2_name, bond_order in params[residue_name][atom_name]:
+                for atom_name, atom_idx in residues[residue_idx].items():
+                    if atom_name in bond_props:
+                        for atom2_name, bond_order in bond_props[atom_name]:
                             if atom2_name in mol_structure[chain][residue_idx]:
                                 mol_editable.AddBond(atom_idx, mol_structure[chain][residue_idx][atom2_name], BOND_TYPES[bond_order])
+
+                for atom_name, atom_idx in residues[residue_idx].items():
+                    if atom_name in atom_props:
+                        atom = mol_editable.GetAtomWithIdx(atom_idx)
+                        atom.UpdatePropertyCache(strict=False)
+                        atom.SetFormalCharge(atom_props[atom_name])
+                        atom.SetNoImplicit(True)
 
             else:
                 print(f"Residue {residue_name} {residue_number} is not recognized")
 
-    
     return mol_editable.GetMol()
+
+
+def extract_structure_properties(mol):
+
+    BOND_TYPES = {1.0:1,
+                  2.0:2,
+                  3.0:3,
+                  1.5:4}
+
+    atom_properties = {}
+    bond_properties = {}
+
+    for i, a in enumerate(mol.GetAtoms()):
+        formal_charge = a.GetFormalCharge()
+        atom_properties[i] = formal_charge
+
+    for i, b in enumerate(mol.GetBonds()):
+        begin_idx = b.GetBeginAtomIdx()
+        end_idx = b.GetEndAtomIdx()
+        b_order = b.GetBondTypeAsDouble()
+        bond_properties[i] = [begin_idx, end_idx, BOND_TYPES[b_order]]
+
+    return atom_properties, bond_properties
+
+
+def create_skeleton_mol(connectivity):
+
+    atoms = list(set([cc for c in connectivity for cc in c[:2]]))
+
+    skeleton_mol = Chem.RWMol()
+
+    for a in atoms:
+        symbol = "".join([aa for aa in a if not aa.isdigit()])
+        idx = skeleton_mol.AddAtom(Chem.Atom(symbol))
+        skeleton_mol.GetAtomWithIdx(idx).SetProp("_Name", a)
+
+    for begin_idx, end_idx, _ in connectivity:
+        begin_idx = atoms.index(begin_idx)
+        end_idx   = atoms.index(end_idx)
+        skeleton_mol.AddBond(begin_idx, end_idx, order=Chem.BondType.SINGLE)
+
+    return skeleton_mol
 
 
 def parse_params(paramsstring):
 
+    smiles = "None"
     name = None
     connectivity = []
 
     for s in paramsstring.split("\n"):
+
+        if s.startswith("#SMILES: "):
+            smiles = s.split(" ")[1]
 
         if s.startswith("IO_STRING"):
             name = s.split(" ")[1]
@@ -134,15 +188,39 @@ def parse_params(paramsstring):
             s = list(filter(lambda x: x != "", s.split(" ")))
             connectivity.append([s[1], s[2], int(s[3].replace("#ORGBND", ""))])
 
-    nodes = set([cc for c in connectivity for cc in c[:2]])
+    smiles_params = Chem.SmilesParserParams()
+    smiles_params.removeHs = False
+    template = Chem.MolFromSmiles(smiles, smiles_params)
+    
+    skeleton_mol = create_skeleton_mol(connectivity)
+    skeleton_mol = AllChem.AssignBondOrdersFromTemplate(template, skeleton_mol)
 
-    reshaped_connectivity = {}
+    if template.HasSubstructMatch(skeleton_mol):
+        skeleton_atom_props  = {} 
+        skeleton_bonds_props = {}
 
-    for node in nodes:
-        reshaped_connectivity[node] = []
+        match = template.GetSubstructMatch(skeleton_mol)
+
+        for i, j in enumerate(match):
+            ref_atom = template.GetAtomWithIdx(j)
+            target_atom = skeleton_mol.GetAtomWithIdx(i)
+
+            target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
+
+        atom_names = [atom.GetProp("_Name") for atom in skeleton_mol.GetAtoms()]
+        skeleton_atom_props, skeleton_bonds_props = extract_structure_properties(skeleton_mol)
+
+        skeleton_atom_props = {atom_names[idx]:props for idx, props in skeleton_atom_props.items()}
+        skeleton_bonds_props = [[atom_names[props[0]], atom_names[props[1]], props[2]] for _, props in skeleton_bonds_props.items()]
+
+
+    reshaped_skeleton_bonds_props = {}
+
+    for node in atom_names:
+        reshaped_skeleton_bonds_props[node] = []
         
         to_delete = []
-        for i, c in enumerate(connectivity):
+        for i, c in enumerate(skeleton_bonds_props):
 
             if node not in c:
                 continue
@@ -150,16 +228,16 @@ def parse_params(paramsstring):
             node2 = c[1] if c.index(node) == 0 else c[0]
             bond_order = c[-1]
 
-            reshaped_connectivity[node].append([node2, bond_order])
+            reshaped_skeleton_bonds_props[node].append([node2, bond_order])
 
             to_delete.append(i)
 
         for i in sorted(to_delete, reverse=True):
-            del connectivity[i]
+            del skeleton_bonds_props[i]
 
-    reshaped_connectivity = {k:v for k, v in reshaped_connectivity.items() if len(v) != 0}
+    reshaped_skeleton_bonds_props = {k:v for k, v in reshaped_skeleton_bonds_props.items() if len(v) != 0}
 
-    return name, reshaped_connectivity
+    return name, reshaped_skeleton_bonds_props, skeleton_atom_props
 
 
 def load_pdbstring(pdbstring, params=[]):
@@ -168,7 +246,7 @@ def load_pdbstring(pdbstring, params=[]):
     mol_structure = parse_structure(mol)
 
     params = [parse_params(p) for p in params]
-    params = dict(params)
+    params = {name:[bonds_props, atom_props] for name, bonds_props, atom_props in params}
 
     mol = assign_bonds(mol, mol_structure, params)
     # mol.UpdatePropertyCache()
