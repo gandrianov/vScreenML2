@@ -29,15 +29,16 @@ def parse_structure(mol):
         residue_num = pdbinfo.GetResidueNumber()
         residue_name = pdbinfo.GetResidueName().strip()
         chain = pdbinfo.GetChainId().strip()
+        insertion_code = pdbinfo.GetInsertionCode()
 
         if chain not in structure:
             structure[chain] = {}
 
-        if f"{residue_name}{residue_num}" not in structure[chain]:
-            structure[chain][f"{residue_name}{residue_num}"] = {}
+        if f"{residue_name}{residue_num}{insertion_code}" not in structure[chain]:
+            structure[chain][f"{residue_name}{residue_num}{insertion_code}"] = {}
 
-        if atom_name not in structure[chain][f"{residue_name}{residue_num}"]:
-            structure[chain][f"{residue_name}{residue_num}"][atom_name] = i
+        if atom_name not in structure[chain][f"{residue_name}{residue_num}{insertion_code}"]:
+            structure[chain][f"{residue_name}{residue_num}{insertion_code}"][atom_name] = i
 
     return structure
 
@@ -57,10 +58,10 @@ def assign_bonds(mol, mol_structure, params):
         previous_residue_idx = None
         previous_residue_number = None
 
-        for residue_idx in sorted(residues, key=lambda x: int(x[3:])):
+        for residue_idx in sorted(residues, key=lambda x: int(x[3:-1])):
 
             residue_name = residue_idx[:3]
-            residue_number = int(residue_idx[3:])
+            residue_number = int(residue_idx[3:-1])
 
             if residue_name in AMINOACID_CONNECTIVITY:
 
