@@ -288,15 +288,18 @@ def read_mol2(mol2fname):
     
     mol2 = open(mol2fname, "r").read()
 
-    atoms_mol2 = mol2.split("@<TRIPOS>ATOM\n")[-1].split("\n@<TRIPOS>BOND")[0]
+    atoms_mol2 = [r for r in mol2.split("@") if r.startswith("<TRIPOS>ATOM\n")][0]
+    atoms_mol2 = atoms_mol2.split("<TRIPOS>ATOM\n")[-1]
+
     atoms_mol2 = [[rr for rr in r.split(" ") if rr != ""] for r in atoms_mol2.split("\n") if len(r) != 0]
     atoms_mol2 = {r[0]:r[5].split(".")[0] for r in atoms_mol2}
 
     atoms_rdkit = {idx:mol.AddAtom(Chem.Atom(symbol)) for idx, symbol in atoms_mol2.items()}
     atoms_rdkit_reverse = {v:k for k,v in atoms_rdkit.items()}
 
+    bonds = [r for r in mol2.split("@") if r.startswith("<TRIPOS>BOND\n")][0]
+    bonds = bonds.split("<TRIPOS>BOND\n")[-1]
 
-    bonds = mol2.split("@<TRIPOS>BOND\n")[-1]
     bonds = [[rr for rr in r.split(" ") if rr != ""] for r in bonds.split("\n") if len(r) != 0]
     bonds = [r[1:] for r in bonds]
 
@@ -322,5 +325,5 @@ def read_mol2(mol2fname):
 
     if Chem.SanitizeMol(mol, sanitizeOps=Chem.SanitizeFlags.SANITIZE_ALL ^ Chem.SanitizeFlags.SANITIZE_KEKULIZE, catchErrors=True) != 0:
         return None
-
+        
     return Chem.MolToSmiles(mol)

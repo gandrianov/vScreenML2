@@ -180,6 +180,9 @@ class MoleculeClass:
             elif l.startswith('@<TRIPOS>CRYSIN'):
                 mode = 4
                 continue
+            elif l.startswith('@<TRIPOS>UNITY_ATOM_ATTR'):
+                mode = None
+                continue
 
             if mode == 1:
                 i_mode1 += 1
