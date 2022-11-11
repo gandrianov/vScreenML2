@@ -725,7 +725,7 @@ class MoleculeClass:
         a.runLBFGS()
         Z = a.get_charges()
         
-        for i,atmname in enumerate(a.mol.atms):
+        for i,atmname in enumerate(a.mol.atoms):
             iatm = self.atom_index(atmname)
             if iatm < 0:
                 print( "Warning while converting AM1 charge: atom index unknown! %s"%(atmname) )
