@@ -154,12 +154,17 @@ def extract_structure_properties(mol):
 
 def create_skeleton_mol(connectivity):
 
+    chem_symbols = ['Si', 'Se', 'Ca', 'Mg', 'Mn', 'Fe', 'Zn', 'Co', 'Cu', 'Ni', 'Cd', 'Br', 'Cl', 'C', 'H', 'O', 'N', 'P', 'S', 'I', 'F', 'B']
+
     atoms = list(set([cc for c in connectivity for cc in c[:2]]))
+    chem_symbols = [[s for s in chem_symbols if a.startswith(s)][0] for a in atoms]
+
+    if len(atoms) != len(chem_symbols):
+        raise Exception("Restoring connectivity failed")
 
     skeleton_mol = Chem.RWMol()
 
-    for a in atoms:
-        symbol = "".join([aa for aa in a if not aa.isdigit()])
+    for a, symbol  in zip(atoms,chem_symbols):
         idx = skeleton_mol.AddAtom(Chem.Atom(symbol))
         skeleton_mol.GetAtomWithIdx(idx).SetProp("_Name", a)
 
