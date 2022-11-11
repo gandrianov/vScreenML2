@@ -288,6 +288,21 @@ def read_mol2(mol2fname):
     
     mol2 = open(mol2fname, "r").read()
 
+
+    # obabel case
+    if len(mol2.split("\n")[1].split(" ")) == 2:
+        smiles = mol2.split("\n")[1].split(" ")[-1]
+        try:
+            mol = Chem.MolFromSmiles(smiles)
+            if Chem.MolFromSmiles(smiles) is not None:
+                mol = Chem.AddHs(mol)
+                return Chem.MolToSmiles(mol)
+        except:
+            pass
+
+
+    # openeye case
+
     atoms_mol2 = [r for r in mol2.split("@") if r.startswith("<TRIPOS>ATOM\n")][0]
     atoms_mol2 = atoms_mol2.split("<TRIPOS>ATOM\n")[-1]
 
