@@ -157,7 +157,7 @@ def create_skeleton_mol(connectivity):
     chem_symbols = ['Si', 'Se', 'Ca', 'Mg', 'Mn', 'Fe', 'Zn', 'Co', 'Cu', 'Ni', 'Cd', 'Br', 'Cl', 'C', 'H', 'O', 'N', 'P', 'S', 'I', 'F', 'B']
 
     atoms = list(set([cc for c in connectivity for cc in c[:2]]))
-    chem_symbols = [[s for s in chem_symbols if a.upper().startswith(s.upper())][0] for a in atoms]
+    chem_symbols = [[s for s in chem_symbols if "".join([aa for aa in a if not aa.isdigit()]).startswith(s)][0] for a in atoms]
 
     if len(atoms) != len(chem_symbols):
         raise Exception("Restoring connectivity failed")
@@ -304,7 +304,6 @@ def read_mol2(mol2fname):
                 return Chem.MolToSmiles(mol)
         except:
             pass
-
 
     # openeye case
 
