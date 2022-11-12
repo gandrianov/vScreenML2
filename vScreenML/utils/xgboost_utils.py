@@ -9,13 +9,13 @@ def train_model():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-features", required=True)
-    parser.add_argument("-model-name", required=True)
+    parser.add_argument("-output-prefix", required=True)
     parser.add_argument("-nsplits", default=5)
 
     args = parser.parse_args()
 
     features = args.features
-    model_name = args.model_name
+    prefix = args.output_prefix
     n_splits = int(args.nsplits)
 
     data = pd.read_csv(features)
@@ -57,16 +57,12 @@ def train_model():
 
     model.fit(X, y, eval_metric="logloss")
 
-    root = __file__
-    root = root[:root.rfind("/")]
-    root = root[:root.rfind("/")]
-
-    with open(f"{root}/models/{model_name}_columns.csv", "w") as fwr:
+    with open(f"{prefix}_columns.csv", "w") as fwr:
         columns = data.select_dtypes(['number']).drop("Class", axis=1).columns
         columns = ",".join(list(columns))
         fwr.write(columns)
 
-    model.save_model(f"{root}/models/{model_name}.json")
+    model.save_model(f"{prefix}_model.json")
 
 
 def predict_vscreenml_score():
@@ -74,28 +70,40 @@ def predict_vscreenml_score():
     parser = argparse.ArgumentParser()
     parser.add_argument("-features", required=True)
     parser.add_argument("-output", required=True)
-    parser.add_argument("-model-name", default="DUDE")
+    parser.add_argument("-model", default="DUDE")
+    parser.add_argument("-columns", default="DUDE")
 
     args = parser.parse_args()
 
     features_filename = args.features
-    model_name = args.model_name
     output = args.output
+    model_fname = args.model
+    columns_fname = args.columns
 
     features = pd.read_csv(features_filename)
 
-    root = __file__
-    root = root[:root.rfind("/")]
-    root = root[:root.rfind("/")]
-
     model = XGBClassifier(use_label_encoder=False)
-    model.load_model(f"{root}/models/{model_name}.json")
 
-    columns = open(f"{root}/models/{model_name}_columns.csv", "r").read().split(",")
+    if model == "DUDE":
+
+        root = __file__
+        root = root[:root.rfind("/")]
+        root = root[:root.rfind("/")]
+
+        model.load_model(f"{root}/models/DUDE.json")
+
+        columns = open(f"{root}/models/DUDE_columns.csv", "r").read().split(",")
+
+    else:
+
+        model.load_model(model_fname)
+        columns = open(columns_fname, "r").read().split(",")
+
 
     for c in columns:
         if c not in features.columns:
             raise Exception(f"Feature {c} is not presented in the {features_filename} file")
+
 
     features["Predicted_Class"] = model.predict(features[c])
     features["VScreenML_Score"] = model.predict_proba(features[c])[:,1]
