@@ -70,8 +70,8 @@ def predict_vscreenml_score():
     parser = argparse.ArgumentParser()
     parser.add_argument("-features", required=True)
     parser.add_argument("-output", required=True)
-    parser.add_argument("-model", default="DUDE")
-    parser.add_argument("-columns", default="DUDE")
+    parser.add_argument("-model")
+    parser.add_argument("-columns")
 
     args = parser.parse_args()
 
@@ -84,28 +84,34 @@ def predict_vscreenml_score():
 
     model = XGBClassifier(use_label_encoder=False)
 
-    if model == "DUDE":
+    if model_fname == "DUDE_openeye":
 
         root = __file__
         root = root[:root.rfind("/")]
         root = root[:root.rfind("/")]
 
-        model.load_model(f"{root}/models/DUDE.json")
+        model.load_model(f"{root}/models/model_dude_openeye_model.json")
+        columns = open(f"{root}/models/model_dude_openeye_columns.csv", "r").read().split(",")
 
-        columns = open(f"{root}/models/DUDE_columns.csv", "r").read().split(",")
+    elif model_fname == "DUDE_openbabel":
+
+        root = __file__
+        root = root[:root.rfind("/")]
+        root = root[:root.rfind("/")]
+
+        model.load_model(f"{root}/models/model_dude_openbabel_model.json")
+        columns = open(f"{root}/models/model_dude_openbabel_columns.csv", "r").read().split(",")
 
     else:
 
         model.load_model(model_fname)
         columns = open(columns_fname, "r").read().split(",")
 
-
     for c in columns:
         if c not in features.columns:
             raise Exception(f"Feature {c} is not presented in the {features_filename} file")
 
-
-    features["Predicted_Class"] = model.predict(features[c])
-    features["VScreenML_Score"] = model.predict_proba(features[c])[:,1]
+    features["Predicted_Class"] = model.predict(features[columns])
+    features["VScreenML_Score"] = model.predict_proba(features[columns])[:,1]
 
     features.to_csv(output, index=False)
