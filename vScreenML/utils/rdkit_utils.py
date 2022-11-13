@@ -301,10 +301,8 @@ def read_mol2(mol2fname):
                   "2" :Chem.BondType.DOUBLE,
                   "3" :Chem.BondType.TRIPLE}
 
-    mol = Chem.RWMol()
-    
-    mol2 = open(mol2fname, "r").read()
 
+    mol2 = open(mol2fname, "r").read()
 
     # obabel case
     if len(mol2.split("\n")[1].split(" ")) == 2:
@@ -315,7 +313,7 @@ def read_mol2(mol2fname):
                 mol = Chem.AddHs(mol)
                 return Chem.MolToSmiles(mol)
         except:
-            pass
+            mol = Chem.RWMol()
 
     # openeye case
 
