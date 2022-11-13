@@ -15,6 +15,7 @@ setup(
     package_data={"":["utils/*.txt",
                       "models/*",
                       "data/*",
+                      "external/generic_potential/*.json",
                       "external/binana/*.md"]},
     include_package_data=True,
     install_requires=open('requirements.txt', 'r').readlines(),
