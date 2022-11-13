@@ -213,12 +213,24 @@ def parse_params(paramsstring):
 
             target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
 
-        atom_names = [atom.GetProp("_Name") for atom in skeleton_mol.GetAtoms()]
-        skeleton_atom_props, skeleton_bonds_props = extract_structure_properties(skeleton_mol)
+    elif skeleton_mol.HasSubstructMatch(template):
+        skeleton_atom_props  = {} 
+        skeleton_bonds_props = {}
 
-        skeleton_atom_props = {atom_names[idx]:props for idx, props in skeleton_atom_props.items()}
-        skeleton_bonds_props = [[atom_names[props[0]], atom_names[props[1]], props[2]] for _, props in skeleton_bonds_props.items()]
+        match = skeleton_mol.GetSubstructMatch(template)
 
+        for j, i in enumerate(match):
+            ref_atom = template.GetAtomWithIdx(j)
+            target_atom = skeleton_mol.GetAtomWithIdx(i)
+
+            target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
+
+
+    atom_names = [atom.GetProp("_Name") for atom in skeleton_mol.GetAtoms()]
+    skeleton_atom_props, skeleton_bonds_props = extract_structure_properties(skeleton_mol)
+
+    skeleton_atom_props = {atom_names[idx]:props for idx, props in skeleton_atom_props.items()}
+    skeleton_bonds_props = [[atom_names[props[0]], atom_names[props[1]], props[2]] for _, props in skeleton_bonds_props.items()]
 
     reshaped_skeleton_bonds_props = {}
 
