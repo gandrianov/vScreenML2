@@ -314,6 +314,8 @@ def read_mol2(mol2fname):
                 return Chem.MolToSmiles(mol)
         except:
             mol = Chem.RWMol()
+    else:
+        mol = Chem.RWMol()
 
     # openeye case
 
