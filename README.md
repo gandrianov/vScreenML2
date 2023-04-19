@@ -10,7 +10,7 @@ Python-based package of [original implementation](https://github.com/karanicolas
 - [XGBoost](https://xgboost.readthedocs.io/en/stable/)
 - [ODDT](https://oddt.readthedocs.io/en/latest/)
 
-The most of packages will be installed automatically with vScreenML. But before installation of PyRosetta package, it requires to apply for licence on [UW website](https://els2.comotion.uw.edu/product/pyrosetta). After accepting license terms, you will get credentials to log in on the [PyRosetta packages repository](https://graylab.jhu.edu/download/PyRosetta4/archive/release/). We recommend to install release version of the package in wheel format using `pip`:
+The most of packages will be installed automatically with vScreenML. But before installation of PyRosetta package, it requires to apply for licence on [UW website](https://els2.comotion.uw.edu/product/pyrosetta). After accepting license terms, you will get credentials to log in on the [PyRosetta packages repository](https://graylab.jhu.edu/download/PyRosetta4/archive/release/) and choose package based on operation system and your version of Python. We recommend to install release version of the package in wheel format using `pip`:
 
 ```
 pip install pyrosetta-2022.41+release.28dc2a1757f-cp310-cp310-macosx_12_0_arm64.whl
