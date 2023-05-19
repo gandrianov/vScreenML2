@@ -168,10 +168,10 @@ def create_skeleton_mol(connectivity):
         idx = skeleton_mol.AddAtom(Chem.Atom(symbol))
         skeleton_mol.GetAtomWithIdx(idx).SetProp("_Name", a)
 
-    for begin_idx, end_idx, _ in connectivity:
+    for begin_idx, end_idx, bond_order in connectivity:
         begin_idx = atoms.index(begin_idx)
         end_idx   = atoms.index(end_idx)
-        skeleton_mol.AddBond(begin_idx, end_idx, order=Chem.BondType.SINGLE)
+        skeleton_mol.AddBond(begin_idx, end_idx, order=BOND_TYPES[bond_order])
 
     return skeleton_mol
 
@@ -197,33 +197,35 @@ def parse_params(paramsstring):
     smiles_params = Chem.SmilesParserParams()
     smiles_params.removeHs = False
     template = Chem.MolFromSmiles(smiles, smiles_params)
-    
+
     skeleton_mol = create_skeleton_mol(connectivity)
-    skeleton_mol = AllChem.AssignBondOrdersFromTemplate(template, skeleton_mol)
+    
+    if smiles != "None":
+        skeleton_mol = AllChem.AssignBondOrdersFromTemplate(template, skeleton_mol)
 
-    if template.HasSubstructMatch(skeleton_mol):
-        skeleton_atom_props  = {} 
-        skeleton_bonds_props = {}
+        if template.HasSubstructMatch(skeleton_mol):
+            skeleton_atom_props  = {} 
+            skeleton_bonds_props = {}
 
-        match = template.GetSubstructMatch(skeleton_mol)
+            match = template.GetSubstructMatch(skeleton_mol)
 
-        for i, j in enumerate(match):
-            ref_atom = template.GetAtomWithIdx(j)
-            target_atom = skeleton_mol.GetAtomWithIdx(i)
+            for i, j in enumerate(match):
+                ref_atom = template.GetAtomWithIdx(j)
+                target_atom = skeleton_mol.GetAtomWithIdx(i)
 
-            target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
+                target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
 
-    elif skeleton_mol.HasSubstructMatch(template):
-        skeleton_atom_props  = {} 
-        skeleton_bonds_props = {}
+        elif skeleton_mol.HasSubstructMatch(template):
+            skeleton_atom_props  = {} 
+            skeleton_bonds_props = {}
 
-        match = skeleton_mol.GetSubstructMatch(template)
+            match = skeleton_mol.GetSubstructMatch(template)
 
-        for j, i in enumerate(match):
-            ref_atom = template.GetAtomWithIdx(j)
-            target_atom = skeleton_mol.GetAtomWithIdx(i)
+            for j, i in enumerate(match):
+                ref_atom = template.GetAtomWithIdx(j)
+                target_atom = skeleton_mol.GetAtomWithIdx(i)
 
-            target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
+                target_atom.SetFormalCharge(ref_atom.GetFormalCharge())
 
 
     atom_names = [atom.GetProp("_Name") for atom in skeleton_mol.GetAtoms()]
