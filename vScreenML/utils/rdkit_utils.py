@@ -192,12 +192,15 @@ def parse_params(paramsstring):
 
         if s.startswith("BOND"):
             s = list(filter(lambda x: x != "", s.split(" ")))
-            connectivity.append([s[1], s[2], int(s[3].replace("#ORGBND", ""))])
+            connectivity.append([s[1], s[2], int(s[-1].replace("#ORGBND", ""))])
 
     smiles_params = Chem.SmilesParserParams()
     smiles_params.removeHs = False
     template = Chem.MolFromSmiles(smiles, smiles_params)
-
+    
+    if template is None:
+        smiles = "None"
+    
     skeleton_mol = create_skeleton_mol(connectivity)
     
     if smiles != "None":
