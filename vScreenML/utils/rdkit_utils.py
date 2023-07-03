@@ -316,7 +316,7 @@ def read_mol2(mol2fname):
             mol = Chem.MolFromSmiles(smiles)
             if Chem.MolFromSmiles(smiles) is not None:
                 mol = Chem.AddHs(mol)
-                return Chem.MolToSmiles(mol)
+                return smiles
         except:
             mol = Chem.RWMol()
     else:
