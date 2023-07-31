@@ -70,7 +70,7 @@ def predict_vscreenml_score():
     parser = argparse.ArgumentParser()
     parser.add_argument("-features", required=True)
     parser.add_argument("-output", required=True)
-    parser.add_argument("-model")
+    parser.add_argument("-model", default="DUDE_openeye")
     parser.add_argument("-columns")
 
     args = parser.parse_args()
