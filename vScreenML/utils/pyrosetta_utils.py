@@ -4,6 +4,7 @@ if importlib.util.find_spec("pyrosetta") is None:
     raise ModuleNotFoundError("PyRosetta is not installed")
 
 import pyrosetta
+import numpy as np
 from pyrosetta.rosetta.core.import_pose import pose_from_pdbstring
 from pyrosetta.rosetta.protocols.rigid import RigidBodyTransMover
 from pyrosetta.rosetta.protocols.grafting import delete_region
@@ -23,6 +24,37 @@ def load_pdbstring(pdbstring):
 
     return pose
 
+def get_around_residues(pose, radii=15.0, lig_chain="X", lig_num=1):
+    
+    info = pose.pdb_info()
+
+    ids = []
+    coords = []
+
+    for resi in range(pose.size()):
+        residue = pose.residue(resi+1)
+        res_chain = info.chain(resi+1)
+        res_number = info.number(resi+1)
+
+        for atomi in range(residue.natoms()):
+            ids.append(f"{res_chain} {res_number}")
+            coords.append(np.array(residue.xyz(atomi+1)))
+
+    coords = np.array(coords)
+    
+    target_residues = set()
+    
+    for i, idx in enumerate(ids):
+        if idx == f"{lig_chain} {lig_num}":
+            ligand_coord = coords[i, :]
+            
+            rmsd = np.sum(np.square(coords - ligand_coord), axis=1)
+            rmsd = np.sqrt(rmsd)
+            
+            residues = np.unique(np.array(ids)[rmsd <= radii], axis=0)
+            target_residues.update(residues)
+    
+    return target_residues
 
 def unbound_pose(pose, residue_id=None):
     
