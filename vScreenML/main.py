@@ -21,6 +21,8 @@ def minimize_pdb_complex():
                         help="PDB file of input protein structure")
     parser.add_argument("-output", type=str, required=True,
                         help="File name for minimized protein-ligand complex")
+    parser.add_argument("-flexible-radii", type=float,
+                        help="Radii in angstroms for defining flexible residues during minimization")
 
     args = parser.parse_args()
 
@@ -29,6 +31,7 @@ def minimize_pdb_complex():
     ligand_params = args.params
     protein = args.protein
     output_pdb = args.output
+    minimizeable_radii = args.flexible_radii
     
     # initialize pyrosetta
     params_filenames = " -extra_res_fa ".join(ligand_params)
@@ -43,7 +46,12 @@ def minimize_pdb_complex():
     bound_pose = pyrosetta_utils.load_pdbstring(pdbstring)
     
     # minimize bound pose
-    bound_pose = pyrosetta_utils.minimize_complex(bound_pose)
+    if minimizeable_radii is not None:
+        flexible_residues = get_around_residues(bound_pose, radii=minimizeable_radii)
+    else:
+        flexible_residues = []
+
+    bound_pose = pyrosetta_utils.minimize_complex(bound_pose, flexible_residues=flexible_residues)
 
     # convert pose to pdb string
     bound_pdb = pyrosetta_utils.export_pdbstring(bound_pose)
