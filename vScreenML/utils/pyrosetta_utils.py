@@ -123,7 +123,7 @@ def export_pdbstring(pose):
     return buffer.str()
 
 
-def minimize_complex(pose):
+def minimize_complex(pose, flexible_residues=[]):
 
     """Minimizes merged protein-ligand complex"""
     
@@ -131,15 +131,29 @@ def minimize_complex(pose):
     minimized_pose = pose.clone()
 
     sfxn = get_score_function()
-    
     # create move map 
     mmap = MoveMap()
-    # allow flexibility on side chains
-    mmap.set_chi(True)
-    # allow flexibility on back bones
-    mmap.set_bb(True)
     # allow flexibility on chains
     mmap.set_jump(True)
+
+    if len(flexible_residues) == 0:
+        # allow flexibility on side chains
+        mmap.set_chi(True)
+        # allow flexibility on back bones
+        mmap.set_bb(True)
+    else:
+        mmap.set_chi(False)
+        mmap.set_bb(False)
+    
+        for resi in flexible_residues:
+
+            resi = resi.split(" ")
+            chain, pdb_resi = resi[0], int(resi[-1])
+
+            pose_resi = minimized_pose.pdb_info().pdb2pose(chain, pdb_resi)
+
+            mmap.set_chi(pose_resi, True)
+            mmap.set_bb(pose_resi, True)
     
     # minimizer
     minimizer = MinMover(movemap_in=mmap,
