@@ -47,7 +47,7 @@ def minimize_pdb_complex():
     
     # minimize bound pose
     if minimizeable_radii is not None:
-        flexible_residues = get_around_residues(bound_pose, radii=minimizeable_radii)
+        flexible_residues = pyrosetta_utils.get_around_residues(bound_pose, radii=minimizeable_radii)
     else:
         flexible_residues = []
 
