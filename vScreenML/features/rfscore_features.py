@@ -48,8 +48,9 @@ class RFScoreCalculator:
                                                 ligand_types=self.ligand_atoms,
                                                 aligned_pairs=False)
 
+        titles = [f"{l}.{p}" for l in self.ligand_atoms for p in self.protein_atoms]
         features = descriptors.build(ligand_mol).tolist()[0]
-        return dict(zip(descriptors.titles, features))
+        return dict(zip(titles, features))
 
 
 
