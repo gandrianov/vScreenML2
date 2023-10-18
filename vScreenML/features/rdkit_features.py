@@ -26,14 +26,24 @@ class RDKitCalculator:
         return CalcTPSA(mol)
 
 def calculate_features(ligand_mol):
+   
+    from rdkit.Chem import rdMolDescriptors 
 
     features = {}
+    descriptor_names = list(rdMolDescriptors.Properties.GetAvailableProperties())
+    del descriptor_names[descriptor_names.index("NumAtomStereoCenters")]
+    del descriptor_names[descriptor_names.index("NumUnspecifiedAtomStereoCenters")]
+
+    get_descriptors = rdMolDescriptors.Properties(descriptor_names)
+    descriptors = list(get_descriptors.ComputeProperties(ligand_mol))
+
+    features = {k:v for k, v in zip(descriptor_names, descriptors)}
 
     rdkit_calculator = RDKitCalculator()
-    features["FCsp3"] = rdkit_calculator.CalcFCsp3(ligand_mol)
+    #features["FCsp3"] = rdkit_calculator.CalcFCsp3(ligand_mol)
     features["NumHAcceptors"] = rdkit_calculator.CalcNumHAcceptors(ligand_mol)
     features["NumHDonors"] = rdkit_calculator.CalcNumHDonors(ligand_mol)
     features["MolLogP"] = rdkit_calculator.CalcMolLogP(ligand_mol)
-    features["TPSA"] = rdkit_calculator.CalcTPSA(ligand_mol)
+    #features["TPSA"] = rdkit_calculator.CalcTPSA(ligand_mol)
 
     return features
