@@ -15,6 +15,7 @@ setup(
     package_data={"":["utils/*.txt",
                       "models/*",
                       "data/*",
+                      "external/STRAIN/TL_2.1_VERSION_6.xml",
                       "external/generic_potential/*.json",
                       "external/binana/*.md"]},
     include_package_data=True,
