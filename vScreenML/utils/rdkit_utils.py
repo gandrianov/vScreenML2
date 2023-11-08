@@ -399,15 +399,23 @@ def find_polar_groups(mol):
 
 def calculate_burunsat_group(burunsat_atoms, polar_groups):
 
+
     burunsat_groups = {}
 
     for grp_name, grp_atoms in polar_groups.items():
-        atoms = [set(burunsat_atoms).intersection(g) for g in grp_atoms]
-        atoms = [g for g in atoms if len(g) != 0]
-        
+
+        burunsat_groups[grp_name] = []
+
+        for g in grp_atoms:
+
+            atoms = set(burunsat_atoms).intersection(g)
+
+            if len(atoms) == len(g):
+                burunsat_groups[grp_name].append(atoms)
+
         if len(grp_atoms) == 0:
             burunsat_groups[grp_name] = 0
         else:
-            burunsat_groups[grp_name] = len(atoms) / len(grp_atoms)
+            burunsat_groups[grp_name] = len(burunsat_groups[grp_name]) / len(grp_atoms)
 
     return burunsat_groups
