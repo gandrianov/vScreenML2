@@ -1,11 +1,12 @@
 import pyrosetta
 from pyrosetta.rosetta.core.scoring import *
-from pyrosetta.rosetta.utility import vector1_double
+from pyrosetta.rosetta.utility import vector1_double, vector1_unsigned_long
 from pyrosetta.rosetta.core.pose.metrics import CalculatorFactory 
 from pyrosetta.rosetta.core.scoring import calc_per_res_hydrophobic_sasa 
 from pyrosetta.rosetta.core.pose.metrics.simple_calculators import SasaCalculatorLegacy 
 from pyrosetta.rosetta.protocols.simple_pose_metric_calculators import NumberHBondsCalculator
 from pyrosetta.rosetta.protocols.simple_pose_metric_calculators import BuriedUnsatisfiedPolarsCalculator
+from pyrosetta.rosetta.protocols.pose_metric_calculators import SHOBuriedUnsatisfiedPolarsCalculator
 
 class SasaCalculator:
 
@@ -111,13 +112,15 @@ class EnergyCalculator:
 class PoseMetricCalculator:
     def __init__(self, sasa_calc_name="sasa", hbond_calc_name="hbond", burunsat_calc_name="burunsat"):
 
+        self.sfxn = get_score_function()
+
         self.sasa_calc = SasaCalculatorLegacy()
         self.sasa_calc_name = sasa_calc_name
 
         self.hb_calc = NumberHBondsCalculator()
         self.hbond_calc_name = hbond_calc_name
 
-        self.burunsat_calc = BuriedUnsatisfiedPolarsCalculator(self.sasa_calc_name, self.hbond_calc_name)
+        self.burunsat_calc = BuriedUnsatisfiedPolarsCalculator(sasa_calc_name, hbond_calc_name)
         self.burunsat_calc_name = burunsat_calc_name
 
         self.calc_factory = CalculatorFactory.Instance()
@@ -130,7 +133,6 @@ class PoseMetricCalculator:
             
         if not self.calc_factory.check_calculator_exists(self.burunsat_calc_name):
             self.calc_factory.register_calculator(self.burunsat_calc_name, self.burunsat_calc)
-
 
     def GetHBInterface(self, bound_pose, unbound_pose):
         bound_hb = bound_pose.print_metric(self.hbond_calc_name, "all_Hbonds")
@@ -152,6 +154,26 @@ class PoseMetricCalculator:
         unbound_unsat = float(unbound_unsat)
 
         return bound_unsat - unbound_unsat
+
+    def GetLigandInterfaceUnsat(self, bound_pose, ligand_id, shobuns_calc_name="shobuns"):
+
+        tgt_res_idxs = vector1_unsigned_long()
+        tgt_res_idxs.append(ligand_id)
+
+        self.sho_buns_calc = SHOBuriedUnsatisfiedPolarsCalculator(4.9, tgt_res_idxs, self.sfxn)
+        self.shobuns_calc_name = shobuns_calc_name
+
+        if not self.calc_factory.check_calculator_exists(self.shobuns_calc_name):
+            self.calc_factory.register_calculator(self.shobuns_calc_name, self.burunsat_calc)
+
+        self.sho_buns_calc.recompute_and_print(bound_pose)
+
+        burunsat_atoms = [(c.rsd(), c.atomno()) for c in self.sho_buns_calc.burunsat_atoms()]
+        burunsat_atoms = [bound_pose.residue(r).atom_name(a) for r, a in burunsat_atoms]
+        burunsat_atoms = [a.strip() for a in burunsat_atoms]
+
+        return burunsat_atoms
+
 
 
 def calculate_features(bound_pose, unbound_pose, ligand_pose, ligand_idx):
@@ -182,5 +204,7 @@ def calculate_features(bound_pose, unbound_pose, ligand_pose, ligand_idx):
     
     features["HBInterface"] = posemetric_calculator.GetHBInterface(bound_pose, unbound_pose)
     features["InterfaceUnsat"] = posemetric_calculator.GetInterfaceUnsat(bound_pose, unbound_pose)
+    features["InterfaceUnsat"] = posemetric_calculator.GetInterfaceUnsat(bound_pose, unbound_pose)
+    features["LigandInterfaceUnsat"] = posemetric_calculator.GetLigandInterfaceUnsat(bound_pose, ligand_idx)
 
     return features

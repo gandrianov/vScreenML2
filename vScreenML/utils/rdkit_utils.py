@@ -363,3 +363,51 @@ def read_mol2(mol2fname):
         return None
         
     return Chem.MolToSmiles(mol)
+
+
+def find_polar_groups(mol):
+
+    atom_names = [a.GetPDBResidueInfo().GetName().strip() for a in mol.GetAtoms()]
+
+    templates = {"NH1":"[#7H][H]", "NH2":"[#7H2]([H])[H]", "NH3":"[#7H3]([H])([H])[H]", "OH":"[OH][H]", "carbonyl O":"[#6]([!O])([!O])=[O&!R]", "carboxylate O":"[#6](=[#8&!R])[#8&!R&D1]"}    
+    templates = {k:Chem.MolFromSmarts(v) for k, v in templates.items()}
+        
+    groups = {k:list(mol.GetSubstructMatches(v)) for k, v in templates.items()}
+
+    for i, g in enumerate(groups["NH1"]):
+        g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() != "N"]
+        groups["NH1"][i] = [atom_names[a] for a in g]
+
+    for i, g in enumerate(groups["NH2"]):
+        g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() != "N"]
+        groups["NH2"][i] = [atom_names[a] for a in g]
+
+    for i, g in enumerate(groups["NH3"]):
+        g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() != "N"]
+        groups["NH3"][i] = [atom_names[a] for a in g]
+    
+    for i, g in enumerate(groups["carbonyl O"]):
+        g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() == "O"]
+        groups["carbonyl O"][i] = [atom_names[a] for a in g]
+
+    for i, g in enumerate(groups["carboxylate O"]):
+        g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() == "O"]
+        groups["carboxylate O"][i] = [atom_names[a] for a in g]
+
+    return groups
+
+
+def calculate_burunsat_group(burunsat_atoms, polar_groups):
+
+    burunsat_groups = {}
+
+    for grp_name, grp_atoms in polar_groups.items():
+        atoms = [set(burunsat_atoms).intersection(g) for g in grp_atoms]
+        atoms = [g for g in atoms if len(g) != 0]
+        
+        if len(grp_atoms) == 0:
+            burunsat_groups[grp_name] = 0
+        else:
+            burunsat_groups[grp_name] = len(atoms) / len(grp_atoms)
+
+    return burunsat_groups

@@ -7,7 +7,10 @@ from vScreenML.features import pyrosetta_features
 from vScreenML.features import binana_features
 from vScreenML.features import rfscore_features
 from vScreenML.features import rdkit_features
+from vScreenML.features import strain_features
+from vScreenML.features import luna_features
 
+from PocketDruggability.cmds import pocket_features
 
 def minimize_pdb_complex():
 
@@ -113,6 +116,16 @@ def calculate_features():
     binana_feats = binana_features.calculate_features(ligand_mol, protein_mol)
     rfscore_feats = rfscore_features.calculate_features(ligand_mol, protein_mol)
     rdkit_feats = rdkit_features.calculate_features(ligand_mol)
+    strain_feats = strain_features.calculate_features(ligand_mol)
+    luna_feats = luna_features.calculate_features(pdbstring, params_strings)
+    pocket_feats = pocket_features(pdbstring.split("\n"), "LG1", 4.0)
+    del pocket_feats["PDBid"]
+
+    # buns
+    polar_groups = rdkit_utils.find_polar_groups(ligand_mol) 
+    burunsat_groups = rdkit_utils.calculate_burunsat_group(pyrosetta_feats["LigandInterfaceUnsat"], polar_groups)
+    pyrosetta_feats.update(burunsat_groups)
+    del pyrosetta_feats["LigandInterfaceUnsat"]
 
     # storage for features
     features = {"name": pdb_complex}
@@ -120,6 +133,10 @@ def calculate_features():
     features.update(binana_feats)
     features.update(rfscore_feats)
     features.update(rdkit_feats)
+    features.update(strain_feats)
+    features.update(luna_feats)
+    features.update(pocket_feats)
+    
 
     for k,v in features.items():
         if type(v) is not str:
