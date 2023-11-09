@@ -139,7 +139,7 @@ def calculate_features():
     
 
     for k,v in features.items():
-        if type(v) is not str:
+        if type(v) is not str and v is not None:
             features[k] = str(round(v, 2))
 
     formatted_output = ",".join(list(features.keys())) + "\n"
