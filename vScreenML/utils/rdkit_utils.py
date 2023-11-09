@@ -385,6 +385,9 @@ def find_polar_groups(mol):
     for i, g in enumerate(groups["NH3"]):
         g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() != "N"]
         groups["NH3"][i] = [atom_names[a] for a in g]
+     
+    for i, g in enumerate(groups["OH"]):
+        groups["OH"][i] = [atom_names[a] for a in g]
     
     for i, g in enumerate(groups["carbonyl O"]):
         g = [idx for idx in g if mol.GetAtomWithIdx(idx).GetSymbol() == "O"]
@@ -398,7 +401,6 @@ def find_polar_groups(mol):
 
 
 def calculate_burunsat_group(burunsat_atoms, polar_groups):
-
 
     burunsat_groups = {}
 
