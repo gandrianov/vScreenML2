@@ -75,6 +75,15 @@ class StrainCalculator():
 
         data_sums = data[["strain_energy", "strain_energy_ci_lower", "strain_energy_ci_upper"]].sum()
 
+        if data["strain_energy"].isna().sum() > 0:
+            data_sums["strain_energy"] = None
+
+        if data["strain_energy_ci_lower"].isna().sum() > 0:
+            data_sums["strain_energy_ci_lower"] = None
+
+        if data["strain_energy_ci_upper"].isna().sum() > 0:
+            data_sums["strain_energy_ci_upper"] = None
+
         return data_sums.to_dict()
 
 
