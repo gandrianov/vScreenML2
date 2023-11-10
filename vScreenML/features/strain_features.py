@@ -92,5 +92,5 @@ def calculate_features(mol):
     calc = StrainCalculator()
 
     features = calc.calculate_energy(mol)
-    
+
     return features

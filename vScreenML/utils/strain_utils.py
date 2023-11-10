@@ -148,7 +148,7 @@ def process_match(theta, pattern):
 
     else:
        
-        energy = None
+        energy = float("inf")
 
         for i, theta_0 in enumerate(pattern["theta_0"]):
             delta = ang_diff(theta, theta_0)
