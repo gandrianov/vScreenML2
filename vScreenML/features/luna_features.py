@@ -149,7 +149,7 @@ def process_structure(pdb_file, params_strings, ligand_resname, ligand_chain, li
     inter_calc = InteractionCalculator(inter_filter=InteractionFilter.new_pli_filter(), add_proximal=False)
     interactions_mngr = inter_calc.calc_interactions(atm_grps_mngr.atm_grps)
 
-    atm_grps_mngr.merge_hydrophobic_atoms(interactions_mngr)
+    # atm_grps_mngr.merge_hydrophobic_atoms(interactions_mngr)
 
     interactions = {"Proximal": 0, "Hydrogen bond": 0, "Ionic": 0, "Salt bridge": 0, "Cation-pi": 0, "Hydrophobic": 0, "Halogen bond": 0, "Repulsive": 0, "Water-bridged hydrogen bond": 0, "Amide-aromatic stacking": 0, "Weak hydrogen bond": 0, "Covalent bond": 0, "Atom overlap": 0, "Van der Waals clash": 0, "Van der Waals": 0, "Chalcogen bond": 0, "Chalcogen-pi": 0, "Halogen-pi": 0, "Orthogonal multipolar": 0, "Parallel multipolar": 0, "Antiparallel multipolar": 0, "Tilted multipolar": 0, "Multipolar": 0, "Cation-nucleophile": 0, "Anion-electrophile": 0, "Unfavorable anion-nucleophile": 0, "Unfavorable cation-electrophile": 0, "Unfavorable nucleophile-nucleophile": 0, "Unfavorable electrophile-electrophile": 0, "Pi-stacking": 0, "Face-to-face pi-stacking": 0, "Face-to-edge pi-stacking": 0, "Face-to-slope pi-stacking": 0, "Edge-to-edge pi-stacking": 0, "Edge-to-face pi-stacking": 0, "Edge-to-slope pi-stacking": 0, "Displaced face-to-face pi-stacking": 0, "Displaced face-to-edge pi-stacking": 0, "Displaced face-to-slope pi-stacking": 0}
 
