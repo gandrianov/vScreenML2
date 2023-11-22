@@ -63,55 +63,87 @@ def train_model():
         fwr.write(columns)
 
     model.save_model(f"{prefix}_model.json")
-
-
+    
 def predict_vscreenml_score():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-features", required=True)
     parser.add_argument("-output", required=True)
-    parser.add_argument("-model", default="DUDE_openeye")
-    parser.add_argument("-columns")
-
+    
     args = parser.parse_args()
 
-    features_filename = args.features
-    output = args.output
-    model_fname = args.model
-    columns_fname = args.columns
+    columns = ["TotalExposedSasa", "TotalBSA", "InterfaceHydrophobicSasa", 
+               "InterfacePolarSasa", "InteractionScore", "FaAtrInteraction", 
+               "FaRepInteraction", "FaSolInteraction", "FaElecInteraction", 
+               "HBondBbScInteraction", "HBondScInteraction", "GenBonded", 
+               "HBInterface", "InterfaceUnsat", "NH1", "NH2", "NH3", "OH", 
+               "carbonyl O", "carboxylate O", "SideFlexAlpha", "SideFlexBeta", 
+               "SideFlexOther", "BackFlexAlpha", "BackFlexBeta", 
+               "BackFlexOther", "PiPi", "TStacking", "CationPi", "SaltBridge", 
+               "TotalElec", "TotalHBond", "TotalHphobics", "6.6", "6.7", "6.8", 
+               "6.16", "7.6", "7.7", "7.8", "7.16", "8.6", "8.7", "8.8", "8.16",
+               "9.6", "9.7", "9.8", "9.16", "15.6", "15.7", "15.8", "15.16",
+               "16.6", "16.7", "16.8", "16.16", "17.6", "17.7", "17.8", "17.16",
+               "35.6", "35.7", "35.8", "35.16", "53.6", "53.7", "53.8", "53.16",
+               "exactmw", "amw", "lipinskiHBA", "lipinskiHBD",
+               "NumRotatableBonds", "NumHBD", "NumHBA", "NumHeavyAtoms",
+               "NumAtoms", "NumHeteroatoms", "NumAmideBonds", "FractionCSP3",
+               "NumRings", "NumAromaticRings", "NumAliphaticRings",
+               "NumSaturatedRings", "NumHeterocycles", 
+               "NumAromaticHeterocycles", "NumSaturatedHeterocycles",
+               "NumAliphaticHeterocycles", "NumSpiroAtoms", 
+               "NumBridgeheadAtoms", "labuteASA", "tpsa", "CrippenClogP", 
+               "CrippenMR", "chi0v", "chi1v", "chi2v", "chi3v", "chi4v", 
+               "chi0n", "chi1n", "chi2n", "chi3n", "chi4n", "hallKierAlpha", 
+               "kappa1", "kappa2", "kappa3", "Phi", "NumHAcceptors", 
+               "NumHDonors", "MolLogP", "strain_energy", "Proximal", 
+               "Hydrogen bond", "Ionic", "Salt bridge", "Cation-pi", 
+               "Hydrophobic", "Halogen bond", "Repulsive", 
+               "Water-bridged hydrogen bond",  "Amide-aromatic stacking", 
+               "Weak hydrogen bond", "Covalent bond", "Atom overlap", 
+               "Van der Waals clash", "Van der Waals", "Chalcogen bond", 
+               "Chalcogen-pi", "Halogen-pi", "Orthogonal multipolar", 
+               "Parallel multipolar", "Antiparallel multipolar", 
+               "Tilted multipolar", "Multipolar", "Cation-nucleophile", 
+               "Anion-electrophile", "Unfavorable anion-nucleophile", 
+               "Unfavorable cation-electrophile", 
+               "Unfavorable nucleophile-nucleophile", 
+               "Unfavorable electrophile-electrophile", "Pi-stacking", 
+               "Face-to-face pi-stacking", "Face-to-edge pi-stacking", 
+               "Face-to-slope pi-stacking", "Edge-to-edge pi-stacking", 
+               "Edge-to-face pi-stacking", "Edge-to-slope pi-stacking", 
+               "Displaced face-to-face pi-stacking", 
+               "Displaced face-to-edge pi-stacking", 
+               "Displaced face-to-slope pi-stacking", "C_RESIDUE", "INERTIA_3", 
+               "SMALLEST_SIZE", "SURFACE_HULL", "VOLUME_HULL", 
+               "hydrophobic_kyte", "hydrophobicity_pocket", "p_Ccoo", 
+               "p_N_atom", "p_Ooh", "p_aliphatic_residue", "p_aromatic_residue", 
+               "p_negative_residue"]
 
-    features = pd.read_csv(features_filename)
+    important_cols = ['TotalBSA', 'InteractionScore', 'FaRepInteraction', 
+                      'FaSolInteraction', 'FaElecInteraction', 'NH1', 'NH2', 
+                      'NH3', 'OH', 'carbonyl O', 'carboxylate O', '7.8', '7.16', 
+                      '8.8', '16.6', '17.16', '35.8', 'NumRotatableBonds', 
+                      'NumHeavyAtoms', 'NumHeteroatoms', 
+                      'NumAromaticHeterocycles', 'NumSaturatedHeterocycles', 
+                      'tpsa', 'kappa1', 'Hydrogen bond', 'Repulsive', 
+                      'Weak hydrogen bond', 'C_RESIDUE', 'SMALLEST_SIZE', 
+                      'hydrophobic_kyte', 'p_aromatic_residue', 
+                      'p_negative_residue']
 
-    model = XGBClassifier(use_label_encoder=False)
+    all_features_clf   = XGBClassifier(use_label_encoder=False)
+    imprt_features_clf = XGBClassifier(use_label_encoder=False)
 
-    if model_fname == "DUDE_openeye":
+    root = __file__
+    root = root[:root.rfind("/")]
+    root = root[:root.rfind("/")]
 
-        root = __file__
-        root = root[:root.rfind("/")]
-        root = root[:root.rfind("/")]
+    all_features_clf.load_model(f"{root}/models/all_feats_model.json")
+    imprt_features_clf.load_model(f"{root}/models/imprt_feats_model.json")
 
-        model.load_model(f"{root}/models/model_dude_openeye_model.json")
-        columns = open(f"{root}/models/model_dude_openeye_columns.csv", "r").read().split(",")
+    features = pd.read_csv(args.features)
 
-    elif model_fname == "DUDE_openbabel":
-
-        root = __file__
-        root = root[:root.rfind("/")]
-        root = root[:root.rfind("/")]
-
-        model.load_model(f"{root}/models/model_dude_openbabel_model.json")
-        columns = open(f"{root}/models/model_dude_openbabel_columns.csv", "r").read().split(",")
-
-    else:
-
-        model.load_model(model_fname)
-        columns = open(columns_fname, "r").read().split(",")
-
-    for c in columns:
-        if c not in features.columns:
-            raise Exception(f"Feature {c} is not presented in the {features_filename} file")
-
-    features["Predicted_Class"] = model.predict(features[columns])
-    features["VScreenML_Score"] = model.predict_proba(features[columns])[:,1]
-
-    features.to_csv(output, index=False)
+    features["vScreenML (all feats)"]   = all_features_clf.predict_proba(features[columns])[:,1]
+    features["vScreenML (imprt feats)"] = imprt_features_clf.predict_proba(features[important_cols])[:,1]
+    
+    features.to_csv(args.output, index=False)
