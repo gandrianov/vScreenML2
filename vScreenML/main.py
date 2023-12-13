@@ -89,7 +89,7 @@ def calculate_features():
     params_strings = [open(p, "r").read() for p in ligand_params]
 
     # initialize pyrosetta
-    pyrosetta_utils.init_pyrosetta(f"-beta -extra_res_fa {params_filenames}") 
+    pyrosetta_utils.init_pyrosetta(f"-ignore_zero_occupancy false -beta -extra_res_fa {params_filenames}") 
 
     # read input structure in rosetta
     pdbstring = open(pdb_complex).read()
