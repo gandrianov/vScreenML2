@@ -38,7 +38,7 @@ def minimize_pdb_complex():
     
     # initialize pyrosetta
     params_filenames = " -extra_res_fa ".join(ligand_params)
-    pyrosetta_utils.init_pyrosetta(f"-beta -ignore_zero_occupancy -extra_res_fa {params_filenames}")
+    pyrosetta_utils.init_pyrosetta(f"-beta -ignore_zero_occupancy false -extra_res_fa {params_filenames}")
 
     # compile pdb into one pdb strings
     ligand_pdb_strings = [open(p, "r").read() for p in ligand_pdbs]
