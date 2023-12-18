@@ -80,7 +80,8 @@ def assign_bonds(mol, mol_structure, params):
                     pass
 
                 elif previous_residue_number + 1 == residue_number:
-                    mol_editable.AddBond(mol_structure[chain][residue_idx]["N"], mol_structure[chain][previous_residue_idx]["C"], BOND_TYPES[1])
+                    if len(set(mol_structure[chain][residue_idx]).intersection(["1H", "2H", "3H"])) == 0:
+                        mol_editable.AddBond(mol_structure[chain][residue_idx]["N"], mol_structure[chain][previous_residue_idx]["C"], BOND_TYPES[1])
 
                 previous_residue_idx = residue_idx
                 previous_residue_number = residue_number
