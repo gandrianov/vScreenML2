@@ -22,6 +22,8 @@ def load_pdbstring(pdbstring):
     pose = pyrosetta.Pose()    
     pose_from_pdbstring(pose, pdbstring)
 
+    get_score_function()(pose)
+
     return pose
 
 def get_around_residues(pose, radii=15.0, lig_chain="X", lig_num=1):
