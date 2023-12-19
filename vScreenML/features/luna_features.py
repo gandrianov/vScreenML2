@@ -169,5 +169,13 @@ def process_structure(pdb_file, params_strings, ligand_resname, ligand_chain, li
 
 def calculate_features(pdbstring, params_strings):
 
+    for l in pdbstring.split("\n"):
+        if l.startswith("HETATM") and "LG1" in l[17:21]:
+
+            ligand_chain = l[21:22]
+            ligand_num = int(l[22:27])
+            
+            break
+
     features = process_structure(pdbstring, params_strings, ligand_resname="LG1", ligand_chain="X", ligand_num=1)
     return features
