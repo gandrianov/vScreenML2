@@ -78,6 +78,8 @@ def unbound_pose(pose, residue_id=None):
     trans_mover.step_size(1000000.0)
     trans_mover.apply(unbound)
 
+    get_score_function()(unbound)
+
     return unbound
 
 
@@ -111,6 +113,8 @@ def decompose_pose(bound, residue_id):
     # remove ligand from bound
     delete_region(protein, residue_id, residue_id)
 
+    get_score_function()(ligand)
+    get_score_function()(protein)
 
     return ligand, protein
 
@@ -168,5 +172,7 @@ def minimize_complex(pose, flexible_residues=[]):
 
     minimizer.max_iter(10000)
     minimizer.apply(minimized_pose)
+
+    get_score_function()(minimizer)
     
     return minimized_pose
