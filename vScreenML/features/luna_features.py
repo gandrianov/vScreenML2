@@ -177,5 +177,5 @@ def calculate_features(pdbstring, params_strings):
             
             break
 
-    features = process_structure(pdbstring, params_strings, ligand_resname="LG1", ligand_chain="X", ligand_num=1)
+    features = process_structure(pdbstring, params_strings, ligand_resname="LG1", ligand_chain=ligand_chain, ligand_num=ligand_num)
     return features
