@@ -31,6 +31,8 @@ class SasaCalculator:
         ligand_sasa = ligand_pose.print_metric(self.sasa_calc_name, "total_sasa")
         ligand_sasa = float(ligand_sasa)
 
+        unbound_sasa = unbound_sasa - ligand_sasa
+
         return 1 - ( ( (unbound_sasa + ligand_sasa) - bound_sasa) * 0.5 / ligand_sasa)
 
     def GetTotalBSA(self, bound_pose, unbound_pose):
