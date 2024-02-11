@@ -173,6 +173,6 @@ def minimize_complex(pose, flexible_residues=[]):
     minimizer.max_iter(10000)
     minimizer.apply(minimized_pose)
 
-    get_score_function()(minimizer)
+    get_score_function()(minimized_pose)
     
     return minimized_pose
