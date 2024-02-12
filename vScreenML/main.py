@@ -118,7 +118,12 @@ def calculate_features():
     rdkit_feats = rdkit_features.calculate_features(ligand_mol)
     strain_feats = strain_features.calculate_features(ligand_mol)
     luna_feats = luna_features.calculate_features(pdbstring, params_strings)
-    pocket_feats = pocket_features(pdbstring.split("\n"), "LG1", 4.0)
+
+    ligand_number = ligand_pose.pdb_info().number(1)
+    ligand_chain = ligand_pose.pdb_info().chain(1)
+
+    pocket_feats = pocket_features(pdbstring.split("\n"), ligand_code, ligand_number, ligand_chain, "A", "A", 4.0, False)
+
     del pocket_feats["PDBid"]
 
     # buns
