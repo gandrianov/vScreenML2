@@ -206,7 +206,6 @@ def calculate_features(bound_pose, unbound_pose, ligand_pose, ligand_idx):
     
     features["HBInterface"] = posemetric_calculator.GetHBInterface(bound_pose, unbound_pose)
     features["InterfaceUnsat"] = posemetric_calculator.GetInterfaceUnsat(bound_pose, unbound_pose)
-    features["InterfaceUnsat"] = posemetric_calculator.GetInterfaceUnsat(bound_pose, unbound_pose)
     features["LigandInterfaceUnsat"] = posemetric_calculator.GetLigandInterfaceUnsat(bound_pose, ligand_idx)
 
     return features
