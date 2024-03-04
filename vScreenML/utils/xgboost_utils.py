@@ -96,7 +96,7 @@ def predict_vscreenml_score():
                "CrippenMR", "chi0v", "chi1v", "chi2v", "chi3v", "chi4v", 
                "chi0n", "chi1n", "chi2n", "chi3n", "chi4n", "hallKierAlpha", 
                "kappa1", "kappa2", "kappa3", "Phi", "NumHAcceptors", 
-               "NumHDonors", "MolLogP", "strain_energy", "Proximal", 
+               "NumHDonors", "MolLogP", "Proximal", 
                "Hydrogen bond", "Ionic", "Salt bridge", "Cation-pi", 
                "Hydrophobic", "Halogen bond", "Repulsive", 
                "Water-bridged hydrogen bond",  "Amide-aromatic stacking", 
