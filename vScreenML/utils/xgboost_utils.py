@@ -120,16 +120,15 @@ def predict_vscreenml_score():
                "p_N_atom", "p_Ooh", "p_aliphatic_residue", "p_aromatic_residue", 
                "p_negative_residue"]
 
-    important_cols = ['TotalBSA', 'InteractionScore', 'FaRepInteraction', 
-                      'FaSolInteraction', 'FaElecInteraction', 'NH1', 'NH2', 
-                      'NH3', 'OH', 'carbonyl O', 'carboxylate O', '7.8', '7.16', 
-                      '8.8', '16.6', '17.16', '35.8', 'NumRotatableBonds', 
-                      'NumHeavyAtoms', 'NumHeteroatoms', 
-                      'NumAromaticHeterocycles', 'NumSaturatedHeterocycles', 
-                      'tpsa', 'kappa1', 'Hydrogen bond', 'Repulsive', 
-                      'Weak hydrogen bond', 'C_RESIDUE', 'SMALLEST_SIZE', 
-                      'hydrophobic_kyte', 'p_aromatic_residue', 
-                      'p_negative_residue']
+    important_cols = ['TotalExposedSasa', 'TotalBSA', 'InteractionScore', 'FaRepInteraction', 
+                      'FaSolInteraction', 'FaElecInteraction', 'GenBonded', 'InterfaceUnsat', 
+                      'NH1', 'SideFlexAlpha', 'TotalHphobics', '6.6', '6.7', '6.16', '7.7', 
+                      '7.8', '8.7', '8.8', '8.16', '9.16', '16.6', '17.8', 'lipinskiHBD', 
+                      'NumSaturatedRings', 'NumAromaticHeterocycles', 'tpsa', 'chi0v', 'chi2v',
+                      'chi4v', 'chi0n',  'chi4n', 'hallKierAlpha', 'kappa1', 'Phi', 'Hydrogen bond', 
+                      'Weak hydrogen bond', 'Van der Waals clash', 'Chalcogen bond', 'Halogen-pi', 
+                      'Unfavorable cation-electrophile', 'Displaced face-to-edge pi-stacking', 'C_RESIDUE', 
+                      'VOLUME_HULL', 'hydrophobic_kyte', 'p_aromatic_residue', 'p_negative_residue']
 
     all_features_clf   = XGBClassifier(use_label_encoder=False)
     imprt_features_clf = XGBClassifier(use_label_encoder=False)
