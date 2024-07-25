@@ -20,12 +20,16 @@ class CustomInstallCommand(install):
     def install_luna(self):
         subprocess.check_call(["pip", "install", "git+https://github.com/gandrianov/LUNA.git"])
 
+    def install_pocketdruggability(self):
+        subprocess.check_call(["pip", "install", "git+https://github.com/gandrianov/PocketDruggability.git"])
+
     def run(self):
         # Run the standard install process
         install.run(self)
         self.install_requirements()
         self.install_pyrosetta()
-        self.install_luna()        
+        self.install_luna()      
+        self.install_pocketdruggability()
 
 setup(
     name="vScreenML",
