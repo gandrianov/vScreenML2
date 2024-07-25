@@ -1,7 +1,29 @@
 #!/usr/bin/env python
+import subprocess
+
 from setuptools import setup, find_packages
+from setuptools.command.install import install
 
 __version__ = "2.0.0"
+
+class CustomInstallCommand(install):
+
+    def install_pyrosetta(self):
+        subprocess.check_call(["pip", "install", "pyrosetta-installer"])
+        subprocess.check_call(["python", "-c", "import pyrosetta_installer; pyrosetta_installer.install_pyrosetta()"])
+
+    def install_luna(self):
+        subprocess.check_call(["pip", "install", "git+https://github.com/gandrianov/LUNA.git"])
+
+    def install_oddt(self):
+        subprocess.check_call(["pip", "install", "oddt"])
+
+    def run(self):
+        # Run the standard install process
+        install.run(self)
+        self.install_oddt()
+        self.install_pyrosetta()
+        self.install_luna()        
 
 setup(
     name="vScreenML",
@@ -20,6 +42,9 @@ setup(
                       "external/binana/*.md"]},
     include_package_data=True,
     install_requires=open('requirements.txt', 'r').readlines(),
+    cmdclass={
+        'install': CustomInstallCommand,
+    },
     entry_points="""
         [console_scripts]
         vscreenml_calculate_features=vScreenML.main:calculate_features
