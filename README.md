@@ -3,30 +3,12 @@ vScreenML (v2)
 
 Python-based package of [original implementation](https://github.com/karanicolaslab/vscreenml) of [VScreenML](https://www.pnas.org/content/117/31/18477). 
 
-**Required packages**
-
-- [PyRosetta](https://www.pyrosetta.org/downloads)
-- [RDKit](https://www.rdkit.org/docs/Install.html)
-- [XGBoost](https://xgboost.readthedocs.io/en/stable/)
-- [ODDT](https://oddt.readthedocs.io/en/latest/)
-
-The most of packages will be installed automatically with vScreenML. But before installation of PyRosetta package, it requires to apply for licence on [UW website](https://els2.comotion.uw.edu/product/pyrosetta). After accepting license terms, you will get credentials to log in on the [PyRosetta packages repository](https://graylab.jhu.edu/download/PyRosetta4/archive/release/) and choose package based on operation system and your version of Python. We recommend to install release version of the package in wheel format using `pip`:
-
-```
-pip install pyrosetta-2022.41+release.28dc2a1757f-cp310-cp310-macosx_12_0_arm64.whl
-```
-
-Installation on MacOS v12.0+ could be terminated because of error about inappropriate OS. To solve this, you need to rename package file name and run installation command again:
-
-```
-mv pyrosetta-2022.41+release.28dc2a1757f-cp310-cp310-macosx_12_0_arm64.whl \
-   pyrosetta-2022.41+release.28dc2a1757f-cp310-cp310-macosx_10_13_arm64.whl
-```
-
 **Installation**
 
+The package available only on GitHub and it should download all dependencies automatically:
+
 ```
-pip install vScreenML
+pip install git+https://github.com/gandrianov/vScreenML.git
 ```
 
 **Usage**
@@ -37,7 +19,7 @@ Before any predictions, we **strongly recommend** to minimize predicted protein-
 
 - **Ligand parameterization**
 
-At the first step, it needs to generate PDB and param file using alone ligand structure in MOL2 format. Partial charges of ligand atoms should be included into MOL2 file and they can be calculated by [OpenBabel](https://openbabel.org/docs/dev/Command-line_tools/babel.html) or [OpenEye](https://docs.eyesopen.com/toolkits/python/quacpactk/examples_summary_assigncharges.html)
+At the first step, it needs to generate PDB and param file using alone ligand structure in MOL2 format. Partial charges of ligand atoms should be included into MOL2 file and they can be calculated by [OpenBabel](https://openbabel.org/docs/Command-line_tools/babel.html) or [OpenEye](https://docs.eyesopen.com/toolkits/python/quacpactk/examples_summary_assigncharges.html)
 
 ```
 vscreenml_mol2params -s <LIGAND>.mol2 \
