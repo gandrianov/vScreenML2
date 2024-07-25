@@ -9,7 +9,7 @@ __version__ = "2.0.0"
 class CustomInstallCommand(install):
 
     def install_requirements(self):
-        subprocess.check_call(["conda", "install", "-c", "conda-forge", "rdkit", "xgboost", "pandas", "-y"])
+        subprocess.check_call(["conda", "install", "-c", "conda-forge", "rdkit", "xgboost", "pandas", "oddt", "-y"])
         
     def install_pyrosetta(self):
         subprocess.check_call(["pip", "install", "pyrosetta-installer"])
@@ -18,14 +18,9 @@ class CustomInstallCommand(install):
     def install_luna(self):
         subprocess.check_call(["pip", "install", "git+https://github.com/gandrianov/LUNA.git"])
 
-    def install_oddt(self):
-        subprocess.check_call(["pip", "install", "six"])
-        subprocess.check_call(["pip", "install", "oddt"])
-
     def run(self):
         # Run the standard install process
         install.run(self)
-        self.install_oddt()
         self.install_pyrosetta()
         self.install_luna()        
 
