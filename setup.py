@@ -11,7 +11,8 @@ class CustomInstallCommand(install):
     def install_requirements(self):
         subprocess.check_call(["conda", "install", "-c", "conda-forge", "rdkit", "xgboost", "pandas", "oddt", "-y"])
         subprocess.check_call(["conda", "install", "-c", "openeye", "openeye-toolkits", "-y"])
-        
+        subprocess.check_call(["pip", "install", "git+https://github.com/BioPandas/biopandas.git"])
+
     def install_pyrosetta(self):
         subprocess.check_call(["pip", "install", "pyrosetta-installer"])
         subprocess.check_call(["python", "-c", "import pyrosetta_installer; pyrosetta_installer.install_pyrosetta()"])
