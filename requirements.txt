@@ -1,3 +1,4 @@
+six
 rdkit
 oddt
 xgboost
