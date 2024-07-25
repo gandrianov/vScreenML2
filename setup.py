@@ -16,6 +16,7 @@ class CustomInstallCommand(install):
         subprocess.check_call(["pip", "install", "git+https://github.com/gandrianov/LUNA.git"])
 
     def install_oddt(self):
+        subprocess.check_call(["pip", "install", "six"])
         subprocess.check_call(["pip", "install", "oddt"])
 
     def run(self):
