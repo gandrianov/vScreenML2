@@ -21,6 +21,7 @@ class CustomInstallCommand(install):
     def run(self):
         # Run the standard install process
         install.run(self)
+        self.install_requirements()
         self.install_pyrosetta()
         self.install_luna()        
 
