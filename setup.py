@@ -8,6 +8,9 @@ __version__ = "2.0.0"
 
 class CustomInstallCommand(install):
 
+    def install_requirements(self):
+        subprocess.check_call(["conda", "install", "-c", "conda-forge", "rdkit", "xgboost", "pandas", "-y"])
+        
     def install_pyrosetta(self):
         subprocess.check_call(["pip", "install", "pyrosetta-installer"])
         subprocess.check_call(["python", "-c", "import pyrosetta_installer; pyrosetta_installer.install_pyrosetta()"])
