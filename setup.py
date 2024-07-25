@@ -10,6 +10,7 @@ class CustomInstallCommand(install):
 
     def install_requirements(self):
         subprocess.check_call(["conda", "install", "-c", "conda-forge", "rdkit", "xgboost", "pandas", "oddt", "-y"])
+        subprocess.check_call(["conda", "install", "-c", "openeye", "openeye-toolkits", "-y"])
         
     def install_pyrosetta(self):
         subprocess.check_call(["pip", "install", "pyrosetta-installer"])
