@@ -1,8 +1,3 @@
-import importlib
-
-if importlib.util.find_spec("pyrosetta") is None:
-    raise ModuleNotFoundError("PyRosetta is not installed")
-
 import pyrosetta
 import numpy as np
 from pyrosetta.rosetta.core.import_pose import pose_from_pdbstring
